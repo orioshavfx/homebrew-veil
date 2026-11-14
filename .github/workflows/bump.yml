@@ -15,20 +15,25 @@ permissions:
 jobs:
   bump:
     runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ inputs.version }}
+      SHA256: ${{ inputs.sha256 }}
     steps:
       - uses: actions/checkout@v4
       - name: Validate inputs
         run: |
-          [[ "${{ inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.]+)?$ ]]
-          [[ "${{ inputs.sha256 }}" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]] || { echo "bad version"; exit 1; }
+          [[ "$SHA256" =~ ^[0-9a-f]{64}$ ]] || { echo "bad sha256"; exit 1; }
       - name: Update cask
         run: |
-          sed -i -E 's/^(  version ").*(")$/\1${{ inputs.version }}\2/' Casks/veil.rb
-          sed -i -E 's/^(  sha256 ").*(")$/\1${{ inputs.sha256 }}\2/' Casks/veil.rb
+          sed -i -E "s/^(  version \").*(\")$/\1${VERSION}\2/" Casks/veil.rb
+          sed -i -E "s/^(  sha256 \").*(\")$/\1${SHA256}\2/" Casks/veil.rb
+          grep -q "version \"${VERSION}\"" Casks/veil.rb
+          grep -q "sha256 \"${SHA256}\"" Casks/veil.rb
       - name: Commit
         run: |
           git config user.name "veil-release"
           git config user.email "veil-release@users.noreply.github.com"
           git add Casks/veil.rb
-          git diff --cached --quiet || git commit -m "veil ${{ inputs.version }}"
+          git diff --cached --quiet || git commit -m "veil ${VERSION}"
           git push
