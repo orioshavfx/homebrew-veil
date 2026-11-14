@@ -6,10 +6,11 @@ Homebrew tap for [Veil](https://github.com/orioshavfx/Veil) (macOS, Apple Silico
 brew install --cask orioshavfx/veil/veil
 ```
 
-Recent Homebrew versions ask you to trust third-party taps; if it does:
+Installing by the full name above trusts just this cask. To trust the whole tap
+(so you can use the short name `veil`):
 
 ```sh
-brew trust --tap orioshavfx/veil
+brew trust orioshavfx/veil
 ```
 
 Veil is not signed with an Apple Developer ID yet, so macOS shows a warning at the first launch:
